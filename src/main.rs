@@ -35,6 +35,15 @@ struct ContestResponse {
     consumer: String,
 }
 
+#[derive(Serialize)]
+struct CountResponse {
+    elf: i32,
+    #[serde(rename(serialize = "elf on a shelf"))]
+    elf_on_a_shelf: i32,
+    #[serde(rename(serialize = "shelf with no elf on it"))]
+    shelf_with_no_elf_on_it: i32,
+}
+
 async fn hello_world() -> Response {
     String::from("Hello, world!").into_response()
 }
@@ -103,6 +112,21 @@ async fn eating_contest(Json(body): Json<Vec<ReindeerData>>) -> Json<ContestResp
     Json(res)
 }
 
+async fn count_elfs(body: String) -> Json<CountResponse> {
+    let count_elf = body.matches("elf").count();
+    let count_eoas = body.matches("elf on a shelf").count();
+    let count_shelf = body.matches("shelf").count();
+
+    // Format count response.
+    let res = CountResponse {
+        elf: count_elf as i32,
+        elf_on_a_shelf: count_eoas as i32,
+        shelf_with_no_elf_on_it: (count_shelf - count_eoas) as i32,
+    };
+
+    Json(res)
+}
+
 #[shuttle_runtime::main]
 async fn main() -> shuttle_axum::ShuttleAxum {
     let router = Router::new()
@@ -110,7 +134,8 @@ async fn main() -> shuttle_axum::ShuttleAxum {
         .route("/-1/error", get(handle_error))
         .route("/1/*nums", get(cube_the_bits))
         .route("/4/strength", post(sum_strength))
-        .route("/4/contest", post(eating_contest));
+        .route("/4/contest", post(eating_contest))
+        .route("/6", post(count_elfs));
 
     Ok(router.into())
 }
