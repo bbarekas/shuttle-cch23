@@ -5,4 +5,10 @@
 
 ### Status
 
-* Day -1:  :white_check_mark:
+* Day -1: Done 
+* Day 1:  Done 
+* Day 4:  Done
+* Day 5:  Canceled
+* Day 6:  Done
+* Day 7:  Done
+* Day 8:  Done
