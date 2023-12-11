@@ -14,7 +14,7 @@ struct Reindeer {
 #[derive(Deserialize, Debug)]
 struct ReindeerData {
     name: String,
-    //strength: i32,
+    strength: i32,
     speed: f32,
     height: i32,
     antler_width: i32,
@@ -24,7 +24,7 @@ struct ReindeerData {
     candies_eaten_yesterday: i32,
 }
 
-#[derive(Serialize)]
+#[derive(Default, Serialize)]
 struct ContestResponse {
     fastest: String,
     tallest: String,
@@ -47,7 +47,7 @@ async fn sum_strength(Json(body): Json<Vec<Reindeer>>) -> String {
     res.to_string()
 }
 
-async fn eating_contest(Json(body): Json<Vec<ReindeerData>>) -> Json<ContestResponse> {
+async fn eating_contest_old(Json(body): Json<Vec<ReindeerData>>) -> Json<ContestResponse> {
 
     // Find out faster
     let fastest = body
@@ -82,4 +82,46 @@ async fn eating_contest(Json(body): Json<Vec<ReindeerData>>) -> Json<ContestResp
     };
 
     Json(res)
+}
+
+
+async fn eating_contest(Json(body): Json<Vec<ReindeerData>>) -> Json<ContestResponse> {
+
+    let Some(first) = body.first() else {
+        return Json(ContestResponse::default());
+    };
+
+    let (mut fastest, mut tallest, mut magician, mut consumer) = (first, first, first, first);
+    for x in &body {
+        if fastest.speed < x.speed {
+            fastest = x;
+        }
+        if tallest.height < x.height {
+            tallest = x;
+        }
+        if magician.snow_magic_power < x.snow_magic_power {
+            magician = x;
+        }
+        if consumer.candies_eaten_yesterday < x.candies_eaten_yesterday {
+            consumer = x;
+        }
+    }
+    Json(ContestResponse {
+        fastest: format!(
+            "Speeding past the finish line with a strength of {} is {}",
+            fastest.strength, fastest.name,
+        ),
+        tallest: format!(
+            "{} is standing tall with his {} cm wide antlers",
+            tallest.name, tallest.antler_width,
+        ),
+        magician: format!(
+            "{} could blast you away with a snow magic power of {}",
+            magician.name, magician.snow_magic_power,
+        ),
+        consumer: format!(
+            "{} ate lots of candies, but also some {}",
+            consumer.name, consumer.favorite_food,
+        ),
+    })
 }
