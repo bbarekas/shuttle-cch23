@@ -47,6 +47,7 @@ async fn sum_strength(Json(body): Json<Vec<Reindeer>>) -> String {
     res.to_string()
 }
 
+#[allow(clippy::unused_async, dead_code)]
 async fn eating_contest_old(Json(body): Json<Vec<ReindeerData>>) -> Json<ContestResponse> {
 
     // Find out faster
