@@ -21,7 +21,16 @@ pub fn get_routes() -> Router {
 
 async fn count_elfs(body: String) -> Json<CountResponse> {
     let count_elf = body.matches("elf").count();
-    let count_eoas = body.matches("elf on a shelf").count();
+    //let count_eoas = body.matches("elf on a shelf").count();
+
+    let eoas = b"elf on a shelf";
+
+    let count_eoas = body
+        .as_bytes()
+        .windows(eoas.len())
+        .filter(|el| el == eoas)
+        .count();
+
     let count_shelf = body.matches("shelf").count();
 
     // Format count response.
