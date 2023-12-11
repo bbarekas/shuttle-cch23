@@ -27,7 +27,8 @@ async fn main() -> shuttle_axum::ShuttleAxum {
         .merge(days::d04::get_routes())
         .merge(days::d06::get_routes())
         .merge(days::d07::get_routes())
-        .merge(days::d08::get_routes());
+        .merge(days::d08::get_routes())
+        .merge(days::d11::get_routes());
 
     Ok(router.into())
 }
