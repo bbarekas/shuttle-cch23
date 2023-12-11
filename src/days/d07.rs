@@ -6,7 +6,6 @@ use axum::{routing::get,
 use axum_extra::TypedHeader;
 use base64::{engine::general_purpose, Engine as _};
 use headers::Cookie;
-
 use serde::{Deserialize, Serialize};
 
 pub fn get_routes() -> Router {
@@ -18,23 +17,12 @@ pub fn get_routes() -> Router {
 
 }
 
-
-#[derive(Debug, Serialize, Deserialize)]
-struct DecodeResponse {
-    flour: usize,
-    #[serde(rename = "chocolate chips")]
-    chocolate_chips: usize,
-}
-
 async fn decode_cookie(TypedHeader(cookie): TypedHeader<Cookie>) -> impl IntoResponse {
-
     let cookie = cookie.get("recipe").expect("Could not find recipe");
     let decoded_bytes = general_purpose::STANDARD.decode(cookie).unwrap();
-    let recipe_str = String::from_utf8(decoded_bytes).unwrap();
 
-    let recipe: DecodeResponse = serde_json::from_str(&recipe_str).unwrap();
-
-    Json(recipe)
+    // Return the decoded string.
+    String::from_utf8(decoded_bytes).unwrap()
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -120,7 +108,7 @@ async fn bake_cookie(TypedHeader(cookie): TypedHeader<Cookie>) -> impl IntoRespo
         .iter()
         .fold(usize::MAX, |cookies, (ingredient, needed)| {
             let available = pantry.get(ingredient).unwrap_or(&0);
-            cookies.min(available / needed)
+            cookies.min(available.checked_div(*needed).unwrap_or(usize::MAX))
         });
 
     for (key, pantry_value) in &mut pantry {
