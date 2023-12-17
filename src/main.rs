@@ -6,8 +6,9 @@ use axum::{
     response::{IntoResponse, Response},
     Router,
 };
-
+use shuttle_runtime::CustomError;
 use shuttle_persist::PersistInstance;
+use sqlx::PgPool;
 
 async fn hello_world() -> Response {
     String::from("Hello, world!").into_response()
@@ -23,7 +24,13 @@ async fn handle_error() -> (StatusCode, String) {
 #[shuttle_runtime::main]
 async fn main(
     #[shuttle_persist::Persist] persist: PersistInstance,
+    #[shuttle_shared_db::Postgres(local_uri = "postgres://postgres:postgres@localhost:5432/postgres")] pool: PgPool
 ) -> shuttle_axum::ShuttleAxum {
+
+    sqlx::migrate!()
+        .run(&pool)
+        .await
+        .map_err(CustomError::new)?;
 
     let router = Router::new()
         .route("/", get(hello_world))
@@ -34,7 +41,8 @@ async fn main(
         .merge(days::d07::get_routes())
         .merge(days::d08::get_routes())
         .merge(days::d11::get_routes())
-        .merge(days::d12::get_routes(persist));
+        .merge(days::d12::get_routes(persist))
+        .merge(days::d13::get_routes(pool));
 
     Ok(router.into())
 }
