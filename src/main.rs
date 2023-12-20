@@ -45,7 +45,8 @@ async fn main(
         .merge(days::d13::get_routes(pool.clone()))
         .merge(days::d14::get_routes())
         .merge(days::d15::get_routes())
-        .merge(days::d18::get_routes(pool));
+        .merge(days::d18::get_routes(pool))
+        .merge(days::d19::get_routes());
 
     Ok(router.into())
 }
