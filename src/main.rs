@@ -39,6 +39,7 @@ async fn main(
         .route("/-1/error", get(handle_error))
         .merge(days::d01::get_routes())
         .merge(days::d04::get_routes())
+        .merge(days::d05::get_routes())
         .merge(days::d06::get_routes())
         .merge(days::d07::get_routes())
         .merge(days::d08::get_routes())
