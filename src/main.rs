@@ -27,6 +27,8 @@ async fn main(
     #[shuttle_shared_db::Postgres(local_uri = "postgres://postgres:postgres@localhost:5432/postgres")] pool: PgPool
 ) -> shuttle_axum::ShuttleAxum {
 
+    dotenv::dotenv().ok();
+
     sqlx::migrate!()
         .run(&pool)
         .await
@@ -47,7 +49,8 @@ async fn main(
         .merge(days::d15::get_routes())
         .merge(days::d18::get_routes(pool))
         .merge(days::d19::get_routes())
-        .merge(days::d20::get_routes());
+        .merge(days::d20::get_routes())
+        .merge(days::d21::get_routes());
 
     Ok(router.into())
 }
